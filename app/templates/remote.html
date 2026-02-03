@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remote Control - Smart Waste</title>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .remote-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            align-items: center;
+            padding: 2rem;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .control-btn {
+            width: 100%;
+            padding: 1.5rem;
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            backdrop-filter: blur(5px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .control-btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-wet {
+            border-color: var(--wet-color);
+            color: var(--wet-color);
+            background: rgba(10, 255, 157, 0.1);
+        }
+
+        .btn-dry {
+            border-color: var(--dry-color);
+            color: var(--dry-color);
+            background: rgba(0, 225, 255, 0.1);
+        }
+
+        .btn-reset {
+            border-color: var(--text-muted);
+            color: var(--text-secondary);
+        }
+
+        .section-title {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: -1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="animated-bg">
+        <div class="bg-orb orb-1"></div>
+        <div class="bg-orb orb-2"></div>
+    </div>
+
+    <header>
+        <div class="logo">
+            <div class="logo-icon"><i class="fa-solid fa-gamepad"></i></div>
+            <div class="logo-text">REMOTE</div>
+        </div>
+        <div class="status-badge" id="connStatus">
+            <div class="status-dot"></div>
+            <span>CONNECTED</span>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="remote-container">
+            <div class="section-title">Manual Override</div>
+
+            <button class="control-btn btn-wet" onclick="triggerDetection('WET')">
+                <i class="fa-solid fa-apple-whole"></i>
+                Simulate Wet Waste
+            </button>
+
+            <button class="control-btn btn-dry" onclick="triggerDetection('DRY')">
+                <i class="fa-solid fa-newspaper"></i>
+                Simulate Dry Waste
+            </button>
+
+            <button class="control-btn btn-reset" onclick="resetSystem()">
+                <i class="fa-solid fa-rotate-right"></i>
+                Reset System
+            </button>
+        </div>
+
+        <div class="status-message">
+            <p id="actionStatus">Ready to command</p>
+        </div>
+    </div>
+
+    <script>
+        async function triggerDetection(type) {
+            const statusEl = document.getElementById('actionStatus');
+            statusEl.textContent = `Sending ${type} signal...`;
+
+            // Visual Feedback on Phone
+            const btnClass = type === 'WET' ? '.btn-wet' : '.btn-dry';
+            const btn = document.querySelector(btnClass);
+
+            // Pulse animation
+            if (btn) {
+                btn.style.transform = 'scale(0.95)';
+                setTimeout(() => btn.style.transform = 'scale(1)', 150);
+            }
+
+            // Flying icon animation (simulating throw)
+            const icon = document.createElement('i');
+            icon.className = type === 'WET' ? 'fa-solid fa-apple-whole' : 'fa-solid fa-newspaper';
+            icon.style.position = 'fixed';
+            icon.style.left = '50%';
+            icon.style.top = '50%';
+            icon.style.color = type === 'WET' ? 'var(--wet-color)' : 'var(--dry-color)';
+            icon.style.fontSize = '2rem';
+            icon.style.transition = 'all 1s ease-out';
+            icon.style.zIndex = '1000';
+            icon.style.pointerEvents = 'none';
+            document.body.appendChild(icon);
+
+            // Animate flying up and fading
+            requestAnimationFrame(() => {
+                icon.style.transform = 'translate(-50%, -150px) scale(0.5)';
+                icon.style.opacity = '0';
+            });
+
+            setTimeout(() => icon.remove(), 1000);
+
+            try {
+                // Correctly formatted POST request to /api/simulate
+                const response = await fetch('/api/simulate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: type })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    statusEl.textContent = `Success: Simulation Triggered`;
+                    setTimeout(() => statusEl.textContent = 'Ready to command', 2000);
+                } else {
+                    statusEl.textContent = 'Error: ' + (data.message || 'Failed');
+                }
+            } catch (e) {
+                console.error(e);
+                statusEl.textContent = 'Network Error';
+            }
+        }
+
+        async function resetSystem() {
+            const statusEl = document.getElementById('actionStatus');
+            statusEl.textContent = 'Resetting...';
+
+            // Visual pulse for reset
+            const btn = document.querySelector('.btn-reset');
+            if (btn) {
+                btn.style.transform = 'rotate(-10deg) scale(0.95)';
+                setTimeout(() => btn.style.transform = 'rotate(0) scale(1)', 300);
+            }
+
+            try {
+                const response = await fetch('/api/simulate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'RESET' })
+                });
+
+                if (response.ok) {
+                    statusEl.textContent = 'System Reset';
+                    setTimeout(() => statusEl.textContent = 'Ready to command', 2000);
+                } else {
+                    statusEl.textContent = 'Reset Failed';
+                }
+            } catch (e) {
+                statusEl.textContent = 'Network Error';
+            }
+        }
+
+        // Connection Check
+        async function checkConnection() {
+            try {
+                const res = await fetch('/api/status');
+                const isOnline = res.ok;
+                const badge = document.getElementById('connStatus');
+                if (isOnline) {
+                    badge.classList.add('online');
+                    badge.querySelector('span').textContent = 'ONLINE';
+                } else {
+                    badge.classList.remove('online');
+                    badge.querySelector('span').textContent = 'OFFLINE';
+                }
+            } catch (e) {
+                const badge = document.getElementById('connStatus');
+                badge.classList.remove('online');
+                badge.querySelector('span').textContent = 'OFFLINE';
+            }
+        }
+
+        // Check connection every 2 seconds
+        setInterval(checkConnection, 2000);
+        checkConnection();
+    </script>
+</body>
+
+</html>

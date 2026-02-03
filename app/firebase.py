@@ -80,21 +80,15 @@ def get_live_data():
             # Admin SDK method - get entire database
             data = db_ref.get()
         elif USE_REST_API:
-            # REST API method with retry logic
-            max_retries = 3
-            for attempt in range(max_retries):
-                try:
-                    response = requests.get(f"{settings.FIREBASE_DB_URL}/.json", timeout=3)
-                    if response.status_code == 200:
-                        data = response.json()
-                        break
-                except requests.exceptions.RequestException as e:
-                    if attempt < max_retries - 1:
-                        import time
-                        time.sleep(1)  # Simple wait before retry
-                        continue
-                    else:
-                        raise e
+            # REST API method - Fast fail for live data
+            # No retries for live polling to prevent UI freezing
+            try:
+                response = requests.get(f"{settings.FIREBASE_DB_URL}/.json", timeout=2)
+                if response.status_code == 200:
+                    data = response.json()
+            except requests.exceptions.RequestException:
+                # Just fail silently for this poll, next one will try again
+                pass
         
         if data:
             state["connection_status"] = "Online"
@@ -122,6 +116,12 @@ def get_live_data():
                 
                 # Timestamp
                 state["lastUpdated"] = bin_data.get("lastUpdated", None)
+            
+
+            
+            # DEBUG LOGGING
+            print(f"🔥 FIREBASE RAW DATA: {data}")
+            print(f"🔄 PARSED STATE: {state['systemState']} | Waste: {state['lastWaste']}")
             
             logger.debug(f"Firebase data: {state}")
             

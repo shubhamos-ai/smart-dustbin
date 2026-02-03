@@ -4,7 +4,7 @@ from app.firebase import get_live_data, reset_waste_status, get_statistics
 router = APIRouter()
 
 @router.get("/status")
-async def get_status():
+def get_status():
     """
     Get current waste detection status from Firebase
     Returns complete system state including:

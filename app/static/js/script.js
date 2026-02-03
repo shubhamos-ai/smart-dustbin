@@ -117,6 +117,12 @@ async function fetchSystemStatus() {
         // Update connection status
         updateConnectionStatus(data.connection_status === 'Online');
 
+        // Hide loading overlay on first successful load
+        const loader = document.getElementById('loadingOverlay');
+        if (loader && !loader.classList.contains('hidden')) {
+            loader.classList.add('hidden');
+        }
+
         // Get current state
         const systemState = data.systemState || 'IDLE';
         const wasteType = data.lastWaste;
@@ -125,9 +131,12 @@ async function fetchSystemStatus() {
         updateBinStatus(data.wetFull, data.dryFull);
 
         // Handle state changes
-        if (systemState !== currentSystemState) {
-            console.log(`State change: ${currentSystemState} → ${systemState}`);
+        // Check if state changed OR if we are sorting and the waste type changed (to trigger new animation)
+        if (systemState !== currentSystemState || (systemState === 'SORTING' && wasteType !== lastWasteType)) {
+            console.log(`State update: ${currentSystemState} -> ${systemState} | Waste: ${lastWasteType} -> ${wasteType}`);
+
             currentSystemState = systemState;
+            lastWasteType = wasteType;
 
             // Update UI for new state
             updateSystemState(systemState, wasteType);
@@ -141,6 +150,10 @@ async function fetchSystemStatus() {
         updateConnectionStatus(false);
         currentSystemState = 'OFFLINE';
         updateSystemState('OFFLINE');
+
+        // Hide loader even on error so user isn't stuck
+        const loader = document.getElementById('loadingOverlay');
+        if (loader) loader.classList.add('hidden');
     }
 }
 
@@ -246,13 +259,13 @@ function sleep(ms) {
 // Initialize and start polling
 function init() {
     console.log('🚀 Smart Waste Management System initialized');
-    console.log('📡 Polling Firebase every 200ms for real-time updates');
+    console.log('📡 Polling every 1s for updates');
 
     // Initial fetch
     fetchSystemStatus();
 
-    // Poll every 200ms for responsive detection
-    setInterval(fetchSystemStatus, 200);
+    // Poll every 1000ms (1 second) to prevent network lag
+    setInterval(fetchSystemStatus, 1000);
 }
 
 // Start the application

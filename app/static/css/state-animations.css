@@ -102,4 +102,48 @@ body.offline .hub-core {
     100% {
         opacity: 0;
     }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+/* Scanning Laser Effect on Hub */
+.detection-hub::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 68%;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+    transform: translate(-50%, -50%);
+    opacity: 0.3;
+    animation: scan-laser 3s ease-in-out infinite;
+    pointer-events: none;
+    border-radius: 50%;
+    z-index: 5;
+}
+
+@keyframes scan-laser {
+
+    0%,
+    100% {
+        transform: translate(-50%, -100px) scaleX(0.5);
+        opacity: 0;
+    }
+
+    50% {
+        transform: translate(-50%, 0) scaleX(1);
+        opacity: 0.6;
+    }
+
+    80% {
+        transform: translate(-50%, 100px) scaleX(0.5);
+        opacity: 0;
+    }
 }
