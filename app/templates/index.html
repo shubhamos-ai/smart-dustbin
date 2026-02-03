@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Waste Management System</title>
+    <meta name="description" content="AI-powered waste segregation system for efficient recycling">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/state-animations.css">
+</head>
+
+<body>
+
+    <!-- Animated Background -->
+    <div class="animated-bg">
+        <div class="bg-orb orb-1"></div>
+        <div class="bg-orb orb-2"></div>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fa-solid fa-recycle"></i>
+            </div>
+            <div class="logo-text">SMART WASTE</div>
+        </div>
+
+        <div class="status-badge" id="statusBadge">
+            <div class="status-dot"></div>
+            <span id="statusText">CONNECTING</span>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+
+        <!-- Detection Area -->
+        <div class="detection-area">
+
+            <!-- Wet Waste Bin -->
+            <div class="bin-card" id="wetBin">
+                <div class="bin-icon">
+                    <i class="fa-solid fa-apple-whole"></i>
+                </div>
+                <h3>WET WASTE</h3>
+            </div>
+
+            <!-- Central Detection Hub -->
+            <div class="detection-hub">
+                <div class="orbit-ring ring-1"></div>
+                <div class="orbit-ring ring-2"></div>
+
+                <div class="hub-core">
+                    <div class="hub-icon">
+                        <i class="fa-solid fa-fingerprint"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dry Waste Bin -->
+            <div class="bin-card" id="dryBin">
+                <div class="bin-icon">
+                    <i class="fa-solid fa-newspaper"></i>
+                </div>
+                <h3>DRY WASTE</h3>
+            </div>
+
+        </div>
+
+        <!-- Status Message -->
+        <div class="status-message">
+            <h2 id="mainStatus">SYSTEM READY</h2>
+            <p id="subStatus">Awaiting waste detection...</p>
+        </div>
+
+    </div>
+
+    <!-- Waste Particle for Animation -->
+    <div class="waste-particle" id="wasteParticle">
+        <i id="particleIcon" class="fa-solid"></i>
+    </div>
+
+    <!-- Script -->
+    <script src="/static/js/script.js"></script>
+</body>
+
+</html>
