@@ -195,28 +195,51 @@ header {
     padding-top: 2rem;
 }
 
-/* Detection Area Stack - GRID LAYOUT */
+/* Glassmorphism & Aesthetics Upgrade */
+
+/* Enhanced Background */
+:root {
+    --glass-surface: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-glow: rgba(255, 255, 255, 0.2);
+    --neon-wet: #00ff9d;
+    --neon-dry: #00e1ff;
+    --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
 .detection-area {
+    /* Mobile-first: Hub on top, bins below */
     display: grid;
+    grid-template-areas:
+        "hub"
+        "bins";
+    gap: 3rem;
+    width: 100%;
+    justify-items: center;
+}
+
+/* Container for bins in the 'bins' area */
+.detection-area::after {
+    /* Virtual element to hold bins if we stick with grid areas,
+       but actually we need to restructure the HTML or just hack the grid.
+       Let's stick to the previous grid but refine spacing.
+    */
+    content: none;
+}
+
+.detection-area {
     grid-template-areas:
         "hub hub"
         "dry wet";
     grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-    /* Gap between bins */
-    row-gap: 3rem;
-    /* Gap between hub and bins */
-    width: 100%;
-    justify-items: center;
-    align-items: start;
-    margin-top: 1rem;
 }
 
-/* Central Hub */
+/* Premium Glass Hub */
 .detection-hub {
     grid-area: hub;
-    width: 260px;
-    height: 260px;
+    width: 250px;
+    height: 250px;
+    margin-bottom: 2rem;
     position: relative;
     display: flex;
     align-items: center;
@@ -224,19 +247,35 @@ header {
 }
 
 .hub-core {
-    width: 68%;
-    height: 68%;
+    width: 100%;
+    height: 100%;
     border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02));
-    border: 1px solid var(--glass-highlight);
+    background: radial-gradient(circle at 35% 35%,
+            rgba(255, 255, 255, 0.1) 0%,
+            rgba(255, 255, 255, 0.02) 60%,
+            transparent 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-top: 1px solid var(--glass-glow);
     box-shadow:
-        inset 0 0 20px rgba(0, 0, 0, 0.5),
-        0 0 30px rgba(0, 0, 0, 0.2);
+        0 0 50px rgba(0, 0, 0, 0.5),
+        inset 0 0 30px rgba(255, 255, 255, 0.05);
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
     z-index: 10;
     transition: all 0.4s var(--transition-smooth);
+}
+
+.hub-core::after {
+    content: '';
+    position: absolute;
+    inset: -5px;
+    border-radius: 50%;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent 40%);
+    filter: blur(2px);
+    z-index: -1;
 }
 
 .hub-icon {
@@ -281,16 +320,17 @@ header {
     }
 }
 
-/* Bin Cards - Vertical Style for Mobile Grid */
+/* Bin Cards - Sexy Glass */
 .bin-card {
     width: 100%;
     max-width: 160px;
-    /* Limit width */
-    height: 180px;
+    height: 200px;
     /* Taller */
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
-    border: 1px solid var(--glass-border);
-    border-radius: 20px;
+    background: linear-gradient(165deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    box-shadow: var(--shadow-soft);
     display: flex;
     flex-direction: column;
     /* Icon on top of text */
@@ -298,14 +338,15 @@ header {
     justify-content: center;
     padding: 1.5rem;
     gap: 1rem;
-    backdrop-filter: blur(10px);
     transition: all 0.3s var(--transition-smooth);
     position: relative;
     overflow: hidden;
 }
 
 .bin-card.active {
-    transform: scale(1.05);
+    background: linear-gradient(165deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-5px);
 }
 
 /* DRY BIN - LEFT */
@@ -419,104 +460,123 @@ body.detecting-dry .hub-icon {
     color: var(--text-muted);
 }
 
-/* Flying Particle for Animations */
+/* Waste Particle - The 'Thing' Animation */
 .waste-particle {
     position: fixed;
-    /* Starting position: Middle Top (Relative to viewport or close to Hub) */
-    /* We'll set it to center, then animate from there */
-    top: 35%;
-    /* Visual center of the Hub in mobile view */
+    top: 50%;
+    /* Default center */
     left: 50%;
     transform: translate(-50%, -50%) scale(0);
-    width: 60px;
-    height: 60px;
-    z-index: 1000;
+    z-index: 999;
     pointer-events: none;
-    opacity: 0;
+
+    /* Bigger icon for better visibility */
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2.2rem;
+    font-size: 3.5rem;
+    /* Big Icon */
+    filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.5));
 }
 
-/* Animations with Precise Trajectories */
+/* 
+   Animation Sequence:
+   1. Materialize (0-20%): Fade in at center (Hub)
+   2. Identify (20-40%): Scale up slightly, pulse, recognize color
+   3. Transport (40-100%): Fly to bin with easing
+*/
 
-/* Dry (Left) */
-.waste-particle.animating-dry {
-    color: var(--dry-color);
-    filter: drop-shadow(0 0 15px var(--dry-glow));
-    animation: fly-dry-mobile 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-}
-
-/* Wet (Right) */
 .waste-particle.animating-wet {
-    color: var(--wet-color);
-    filter: drop-shadow(0 0 15px var(--wet-glow));
-    animation: fly-wet-mobile 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    color: var(--neon-wet);
+    text-shadow: 0 0 20px var(--neon-wet);
+    animation: process-wet-waste 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
 }
 
-@keyframes fly-dry-mobile {
+.waste-particle.animating-dry {
+    color: var(--neon-dry);
+    text-shadow: 0 0 20px var(--neon-dry);
+    animation: process-dry-waste 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
+
+/* Mobile Trajectories (Hub is Top Center) */
+/* Assumption: Hub is approx at top: 25%, Bins at top: 70% */
+
+@keyframes process-wet-waste {
+
+    /* 1. Appears in HUB */
     0% {
         opacity: 0;
-        top: 35%;
-        /* Hub Center */
+        top: 28%;
+        /* Vertically centered on Mobile Hub */
         left: 50%;
-        transform: translate(-50%, -50%) scale(0.1);
+        transform: translate(-50%, -50%) scale(0);
     }
 
-    10% {
+    /* 2. Recognition Pause */
+    20% {
         opacity: 1;
+        top: 28%;
         transform: translate(-50%, -50%) scale(1);
     }
 
     40% {
-        /* Arc up slightly */
-        top: 30%;
+        top: 28%;
         transform: translate(-50%, -50%) scale(1.1);
+        /* Pulse */
     }
 
+    /* 3. Throw to WET Bin (Right) */
     100% {
         opacity: 0;
         top: 70%;
-        /* Approximate bin height */
-        left: 25%;
-        /* Left side (Dry bin center) */
-        transform: translate(-50%, -50%) scale(0.5);
-    }
-}
-
-@keyframes fly-wet-mobile {
-    0% {
-        opacity: 0;
-        top: 35%;
-        /* Hub Center */
-        left: 50%;
-        transform: translate(-50%, -50%) scale(0.1);
-    }
-
-    10% {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
-    }
-
-    40% {
-        /* Arc up slightly */
-        top: 30%;
-        transform: translate(-50%, -50%) scale(1.1);
-    }
-
-    100% {
-        opacity: 0;
-        top: 70%;
-        /* Approximate bin height */
+        /* Bin Area */
         left: 75%;
-        /* Right side (Wet bin center) */
-        transform: translate(-50%, -50%) scale(0.5);
+        /* Right side */
+        transform: translate(-50%, -50%) scale(0.4) rotate(-360deg);
+    }
+}
+
+@keyframes process-dry-waste {
+
+    /* 1. Appears in HUB */
+    0% {
+        opacity: 0;
+        top: 28%;
+        /* Vertically centered on Mobile Hub */
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0);
+    }
+
+    /* 2. Recognition Pause */
+    20% {
+        opacity: 1;
+        top: 28%;
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    40% {
+        top: 28%;
+        transform: translate(-50%, -50%) scale(1.1);
+        /* Pulse */
+    }
+
+    /* 3. Throw to DRY Bin (Left) */
+    100% {
+        opacity: 0;
+        top: 70%;
+        /* Bin Area */
+        left: 25%;
+        /* Left side */
+        transform: translate(-50%, -50%) scale(0.4) rotate(360deg);
     }
 }
 
 
-/* Desktop Overrides - Reset to standard row if needed, but Grid works everywhere */
+/* Desktop Tweaks */
 @media (min-width: 768px) {
     .container {
         max-width: 1200px;
@@ -526,15 +586,14 @@ body.detecting-dry .hub-icon {
     .detection-area {
         grid-template-areas: "dry hub wet";
         grid-template-columns: 1fr 1fr 1fr;
-        align-items: center;
         gap: 2rem;
-        row-gap: 0;
     }
 
     .detection-hub {
         width: 350px;
         height: 350px;
         order: 2;
+        margin-bottom: 0;
     }
 
     .bin-card {
@@ -542,48 +601,59 @@ body.detecting-dry .hub-icon {
         height: 400px;
     }
 
-    /* DESKTOP Animations */
-    .waste-particle {
-        top: 50%;
-    }
+    @keyframes process-wet-waste {
 
-    @keyframes fly-dry-mobile {
-
-        /* Actually desktop now due to media query, but reusing name for simplicity or overriding */
+        /* Desktop: Hub is center (50% 50%) */
         0% {
             opacity: 0;
+            top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) scale(0);
         }
 
         20% {
             opacity: 1;
-            scale: 1;
+            top: 50%;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        40% {
+            top: 50%;
+            transform: translate(-50%, -50%) scale(1.1);
         }
 
         100% {
             opacity: 0;
-            left: 20%;
-            transform: translate(-50%, -50%) scale(0.5);
+            top: 60%;
+            left: 85%;
+            transform: translate(-50%, -50%) scale(0.4) rotate(-360deg);
         }
     }
 
-    @keyframes fly-wet-mobile {
+    @keyframes process-dry-waste {
         0% {
             opacity: 0;
+            top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) scale(0);
         }
 
         20% {
             opacity: 1;
-            scale: 1;
+            top: 50%;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        40% {
+            top: 50%;
+            transform: translate(-50%, -50%) scale(1.1);
         }
 
         100% {
             opacity: 0;
-            left: 80%;
-            transform: translate(-50%, -50%) scale(0.5);
+            top: 60%;
+            left: 15%;
+            transform: translate(-50%, -50%) scale(0.4) rotate(360deg);
         }
     }
 }

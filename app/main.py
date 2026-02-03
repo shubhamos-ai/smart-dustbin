@@ -47,9 +47,7 @@ app.include_router(simulate.router, prefix="/api", tags=["Simulation"])
 async def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
-@app.get("/remote")
-async def read_remote(request: Request):
-    return templates.TemplateResponse("remote.html", {"request": request})
+
 
 if __name__ == "__main__":
     import uvicorn

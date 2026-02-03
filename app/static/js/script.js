@@ -237,10 +237,18 @@ async function playParticleAnimation(wasteType) {
     }
 
     // Trigger particle animation
+    // The CSS animation is now 1.5s long (Materialize -> Pause -> Fly)
     elements.particle.className = 'waste-particle ' + particleClass;
 
-    // Wait for animation to complete
-    await sleep(1500);
+    // Visual feedback on Hub (Pulse)
+    const hubCore = document.querySelector('.hub-core');
+    if (hubCore) {
+        hubCore.style.transform = 'scale(0.95)';
+        setTimeout(() => hubCore.style.transform = 'scale(1)', 200);
+    }
+
+    // Wait for animation to complete (1.5s + buffer)
+    await sleep(1600);
 
     isAnimating = false;
 }
