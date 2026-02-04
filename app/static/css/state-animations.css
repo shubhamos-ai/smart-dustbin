@@ -147,3 +147,27 @@ body.offline .hub-core {
         opacity: 0;
     }
 }
+
+/* Sparkle effect when trash materializes */
+@keyframes sparkle-burst {
+    0% {
+        box-shadow:
+            0 0 0 0 rgba(255, 255, 255, 0.8),
+            0 0 0 0 rgba(255, 255, 255, 0.6),
+            0 0 0 0 rgba(255, 255, 255, 0.4);
+    }
+
+    50% {
+        box-shadow:
+            0 0 20px 10px rgba(255, 255, 255, 0),
+            0 0 30px 15px rgba(255, 255, 255, 0),
+            0 0 40px 20px rgba(255, 255, 255, 0);
+    }
+
+    100% {
+        box-shadow:
+            0 0 0 0 rgba(255, 255, 255, 0),
+            0 0 0 0 rgba(255, 255, 255, 0),
+            0 0 0 0 rgba(255, 255, 255, 0);
+    }
+}

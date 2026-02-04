@@ -108,10 +108,22 @@ function updateSystemState(state, wasteType = null) {
     }
 }
 
-// Fetch system status from API
+// Fetch system status from API with timeout
 async function fetchSystemStatus() {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
     try {
-        const response = await fetch('/api/status');
+        const response = await fetch('/api/status', {
+            signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
 
         // Update connection status
@@ -146,10 +158,21 @@ async function fetchSystemStatus() {
         }
 
     } catch (error) {
-        console.error('Error fetching status:', error);
+        clearTimeout(timeoutId);
+
+        if (error.name === 'AbortError') {
+            console.warn('Request timeout - server may be slow');
+        } else {
+            console.error('Error fetching status:', error);
+        }
+
         updateConnectionStatus(false);
-        currentSystemState = 'OFFLINE';
-        updateSystemState('OFFLINE');
+
+        // Only update to OFFLINE if we're not already offline
+        if (currentSystemState !== 'OFFLINE') {
+            currentSystemState = 'OFFLINE';
+            updateSystemState('OFFLINE');
+        }
 
         // Hide loader even on error so user isn't stuck
         const loader = document.getElementById('loadingOverlay');
@@ -224,9 +247,9 @@ async function playParticleAnimation(wasteType) {
     // Reset icon classes
     iconElement.className = 'fa-solid';
 
-    // Randomize icons for variety
-    const wetIcons = ['fa-apple-whole', 'fa-leaf', 'fa-carrot', 'fa-fish'];
-    const dryIcons = ['fa-newspaper', 'fa-box-open', 'fa-bottle-water', 'fa-cube'];
+    // Randomize icons for variety - prioritizing paper for Dry
+    const wetIcons = ['fa-apple-whole', 'fa-carrot', 'fa-leaf', 'fa-fish', 'fa-lemon'];
+    const dryIcons = ['fa-file', 'fa-note-sticky', 'fa-scroll', 'fa-newspaper', 'fa-box-open'];
 
     if (isWet) {
         const randomIcon = wetIcons[Math.floor(Math.random() * wetIcons.length)];
@@ -237,7 +260,7 @@ async function playParticleAnimation(wasteType) {
     }
 
     // Trigger particle animation
-    // The CSS animation is now 1.5s long (Materialize -> Pause -> Fly)
+    // The CSS animation is now 1.8s long (Realistic physics-based toss)
     elements.particle.className = 'waste-particle ' + particleClass;
 
     // Visual feedback on Hub (Pulse)
@@ -247,8 +270,8 @@ async function playParticleAnimation(wasteType) {
         setTimeout(() => hubCore.style.transform = 'scale(1)', 200);
     }
 
-    // Wait for animation to complete (1.5s + buffer)
-    await sleep(1600);
+    // Wait for animation to complete (1.8s + buffer)
+    await sleep(1900);
 
     isAnimating = false;
 }
@@ -267,13 +290,17 @@ function sleep(ms) {
 // Initialize and start polling
 function init() {
     console.log('🚀 Smart Waste Management System initialized');
-    console.log('📡 Polling every 1s for updates');
 
-    // Initial fetch
-    fetchSystemStatus();
+    // Start the polling loop
+    pollSystemStatus();
+}
 
-    // Poll every 1000ms (1 second) to prevent network lag
-    setInterval(fetchSystemStatus, 1000);
+// Polling loop with backpressure protection
+async function pollSystemStatus() {
+    await fetchSystemStatus();
+
+    // Schedule next poll only after current one finishes
+    setTimeout(pollSystemStatus, 1000);
 }
 
 // Start the application

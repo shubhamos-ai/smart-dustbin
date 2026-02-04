@@ -5,6 +5,7 @@ import logging
 import os
 import requests
 from datetime import datetime
+import time
 
 # Setup Logger
 logging.basicConfig(level=logging.INFO)
@@ -14,6 +15,13 @@ logger = logging.getLogger("SmartWasteFirebase")
 firebase_app = None
 db_ref = None
 USE_REST_API = False
+
+# Cache for live data to prevent excessive API calls
+_cache = {
+    "data": None,
+    "timestamp": 0,
+    "ttl": 0.5  # Cache for 500ms
+}
 
 def initialize_firebase():
     """Initialize Firebase connection (Admin SDK or REST API)"""
@@ -46,10 +54,15 @@ def initialize_firebase():
 
 def get_live_data():
     """
-    Reads complete system data from Firebase
+    Reads complete system data from Firebase with caching
     Returns: dict with system state, bin status, waste classification, and connection info
     """
-    global db_ref, USE_REST_API
+    global db_ref, USE_REST_API, _cache
+    
+    # Check cache first
+    current_time = time.time()
+    if _cache["data"] is not None and (current_time - _cache["timestamp"]) < _cache["ttl"]:
+        return _cache["data"]
     
     # Default state
     state = {
@@ -120,14 +133,16 @@ def get_live_data():
 
             
             # DEBUG LOGGING
-            print(f"🔥 FIREBASE RAW DATA: {data}")
-            print(f"🔄 PARSED STATE: {state['systemState']} | Waste: {state['lastWaste']}")
-            
-            logger.debug(f"Firebase data: {state}")
+            logger.debug(f"🔥 FIREBASE RAW DATA: {data}")
+            logger.debug(f"🔄 PARSED STATE: {state['systemState']} | Waste: {state['lastWaste']}")
             
     except Exception as e:
         logger.error(f"Error reading Firebase data: {e}") 
         state["connection_status"] = "Error"
+    
+    # Update cache
+    _cache["data"] = state
+    _cache["timestamp"] = current_time
     
     return state
 
