@@ -2,7 +2,7 @@
 
 /* Pulse effect for OBJECT_DETECTED */
 body.pulse-effect .detection-hub {
-    animation: detection-pulse 0.5s ease-out;
+    animation: detection-pulse 0.6s var(--transition-smooth);
 }
 
 @keyframes detection-pulse {
@@ -13,119 +13,56 @@ body.pulse-effect .detection-hub {
     }
 
     50% {
-        transform: scale(1.05);
+        transform: scale(1.02);
     }
 }
 
 /* Analyzing state - faster ring rotation */
 body.analyzing-active .ring-1 {
-    animation: rotate-slow 5s linear infinite !important;
+    animation: rotate 3s linear infinite !important;
 }
 
 body.analyzing-active .ring-2 {
-    animation: rotate-reverse 3s linear infinite !important;
+    animation: rotate-rev 2s linear infinite !important;
 }
 
 body.analyzing-active .hub-core {
-    box-shadow: 0 0 40px rgba(255, 255, 255, 0.2), inset 0 0 30px rgba(255, 255, 255, 0.1);
-    animation: analyzing-glow 1s ease-in-out infinite alternate;
+    box-shadow: 0 0 60px rgba(59, 130, 246, 0.2), inset 0 0 40px rgba(59, 130, 246, 0.1);
+    animation: analyzing-glow 1.5s var(--transition-smooth) infinite alternate;
 }
 
 @keyframes analyzing-glow {
     from {
-        border-color: rgba(255, 255, 255, 0.2);
+        border-color: var(--glass-border);
     }
 
     to {
-        border-color: rgba(255, 255, 255, 0.5);
+        border-color: var(--primary-color);
     }
 }
 
-/* Detecting state - subtle ambient glow */
-body.detecting .ambient-light {
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 60%);
-    animation: ambient-pulse 2s ease-in-out infinite;
-}
-
-@keyframes ambient-pulse {
-
-    0%,
-    100% {
-        opacity: 0.5;
-    }
-
-    50% {
-        opacity: 1;
-    }
-}
-
-/* Bin checking state */
-body.checking-bins .bin-card.active {
-    animation: bin-check 0.8s ease-in-out;
-}
-
-@keyframes bin-check {
-
-    0%,
-    100% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(1.03);
-    }
-}
-
-/* Offline state - desaturated */
+/* Offline state - desaturated and muted */
 body.offline {
-    filter: grayscale(0.5);
+    filter: grayscale(0.8) contrast(0.9);
 }
 
 body.offline .hub-core {
-    opacity: 0.5;
+    opacity: 0.3;
 }
 
-/* Success state - brief celebration */
-.success-flash {
-    animation: success-flash 0.5s ease-out;
-}
-
-@keyframes success-flash {
-    0% {
-        opacity: 0;
-    }
-
-    50% {
-        opacity: 1;
-    }
-
-    100% {
-        opacity: 0;
-    }
-
-    50% {
-        opacity: 1;
-    }
-
-    100% {
-        opacity: 0;
-    }
-}
-
-/* Scanning Laser Effect on Hub */
+/* Scanning Laser Effect on Hub - Refined */
 .detection-hub::after {
     content: '';
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 68%;
-    height: 4px;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+    width: 60%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
     transform: translate(-50%, -50%);
-    opacity: 0.3;
-    animation: scan-laser 3s ease-in-out infinite;
+    opacity: 0;
+    animation: scan-laser 4s ease-in-out infinite;
     pointer-events: none;
-    border-radius: 50%;
     z-index: 5;
 }
 
@@ -133,41 +70,35 @@ body.offline .hub-core {
 
     0%,
     100% {
-        transform: translate(-50%, -100px) scaleX(0.5);
+        transform: translate(-50%, -120px);
         opacity: 0;
+    }
+
+    20%,
+    80% {
+        opacity: 0.5;
     }
 
     50% {
-        transform: translate(-50%, 0) scaleX(1);
-        opacity: 0.6;
-    }
-
-    80% {
-        transform: translate(-50%, 100px) scaleX(0.5);
-        opacity: 0;
+        transform: translate(-50%, 120px);
+        opacity: 0.8;
     }
 }
 
-/* Sparkle effect when trash materializes */
-@keyframes sparkle-burst {
-    0% {
-        box-shadow:
-            0 0 0 0 rgba(255, 255, 255, 0.8),
-            0 0 0 0 rgba(255, 255, 255, 0.6),
-            0 0 0 0 rgba(255, 255, 255, 0.4);
+/* Success state - refined flash */
+.success-flash {
+    animation: success-flash 0.6s var(--transition-smooth);
+}
+
+@keyframes success-flash {
+
+    0%,
+    100% {
+        opacity: 0;
     }
 
     50% {
-        box-shadow:
-            0 0 20px 10px rgba(255, 255, 255, 0),
-            0 0 30px 15px rgba(255, 255, 255, 0),
-            0 0 40px 20px rgba(255, 255, 255, 0);
-    }
-
-    100% {
-        box-shadow:
-            0 0 0 0 rgba(255, 255, 255, 0),
-            0 0 0 0 rgba(255, 255, 255, 0),
-            0 0 0 0 rgba(255, 255, 255, 0);
+        opacity: 0.2;
+        background: var(--primary-color);
     }
 }
