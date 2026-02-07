@@ -8,9 +8,7 @@
     <meta name="description" content="AI-powered waste segregation system for efficient recycling">
 
     <!-- Fonts -->
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -57,12 +55,12 @@
         <!-- Detection Area -->
         <div class="detection-area">
 
-            <!-- Wet Waste Bin -->
-            <div class="bin-card" id="wetBin">
+            <!-- DRY Waste Bin (LEFT) -->
+            <div class="bin-card" id="dryBin">
                 <div class="bin-icon">
-                    <i class="fa-solid fa-leaf"></i>
+                    <i class="fa-solid fa-box"></i>
                 </div>
-                <h3>WET</h3>
+                <h3>DRY</h3>
             </div>
 
             <!-- Central Detection Hub -->
@@ -77,12 +75,12 @@
                 </div>
             </div>
 
-            <!-- Dry Waste Bin -->
-            <div class="bin-card" id="dryBin">
+            <!-- WET Waste Bin (RIGHT) -->
+            <div class="bin-card" id="wetBin">
                 <div class="bin-icon">
-                    <i class="fa-solid fa-box"></i>
+                    <i class="fa-solid fa-leaf"></i>
                 </div>
-                <h3>DRY</h3>
+                <h3>WET</h3>
             </div>
 
         </div>
@@ -102,6 +100,7 @@
 
     <!-- Script -->
     <script src="/static/js/script.js"></script>
+
 </body>
 
 </html>
